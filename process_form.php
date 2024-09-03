@@ -22,8 +22,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $mail->Port       = 587;
 
         // Recipients
-        $mail->setFrom('', 'Your Name');
-        $mail->addAddress('recipient_email@example.com'); // Add a recipient
+        $mail->setFrom('7b656a001@smtp-brevo.com', 'Guest');
+        $mail->addAddress('7b656a001@smtp-brevo.com'); // Add a recipient
 
         // Content
         $mail->isHTML(true); 
