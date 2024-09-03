@@ -1,56 +1,55 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require 'vendor/autoload.php';
-
+require 'vendor/autoload.php'; // Load Composer's autoloader
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = $_POST['name'];
-    $email = $_POST['email'];
-    $message = $_POST['message'];
+    $name = strip_tags(trim($_POST["name"]));
+    $email = filter_var(trim($_POST["email"]), FILTER_SANITIZE_EMAIL);
+    $message = trim($_POST["message"]);
+
+    // Check if the form fields are empty
+    if (empty($name) || empty($message) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        http_response_code(400);
+        echo "Please fill out all the fields.";
+        exit;
+    }
 
     $mail = new PHPMailer(true);
 
     try {
         // Server settings
-        $mail->isSMTP();
-        $mail->Host       = 'smtp-relay.brevo.com'; // Set the SMTP server to send through
-        $mail->SMTPAuth   = true;
-        $mail->Username   = '7b656a001@smtp-brevo.com'; // SMTP username
-        $mail->Password   = 'qOYsCTMNJDn1fgjH'; // SMTP password
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = 587;
+        $mail->isSMTP();                                            // Send using SMTP
+        $mail->Host       = 'smtp-relay.brevo.com';                     // Set the SMTP server to send through
+        $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
+        $mail->Username   = '7b656a002@smtp-brevo.com';               // SMTP username
+        $mail->Password   = 'COaQbEfNAmkMd9Ij';                  // SMTP password
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` also accepted
+        $mail->Port       = 587;                                    // TCP port to connect to
 
         // Recipients
-        $mail->setFrom($email, $name); // Use the sender's name and email
-        $mail->addAddress('7b656a001@smtp-brevo.com'); // Add a recipient
+        $mail->setFrom('7b656a002@smtp-brevo.com', 'Your Name');
+        $mail->addAddress('kaeltheinvoker121@gmail.com', 'Recipient Name'); // Add a recipient
 
         // Content
-        $mail->isHTML(true); 
+        $mail->isHTML(true);                                  // Set email format to HTML
         $mail->Subject = 'New Contact Form Submission';
-        $mail->Body    = "<p><strong>Name:</strong> {$name}</p>
-                          <p><strong>Email:</strong> {$email}</p>
-                          <p><strong>Message:</strong><br>{$message}</p>";
-        $mail->AltBody = "Name: {$name}\nEmail: {$email}\nMessage: {$message}";
+        $mail->Body    = "You have received a new message from your website contact form.<br><br>" .
+                         "Name: $name<br>" .
+                         "Email: $email<br><br>" .
+                         "Message:<br>$message";
+        $mail->AltBody = "You have received a new message from your website contact form.\n\n" .
+                         "Name: $name\n" .
+                         "Email: $email\n\n" .
+                         "Message:\n$message";
 
         $mail->send();
-        echo "<script>
-                document.getElementById('form-message-success').style.display = 'block';
-              </script>";
+        echo 'Your message was sent, thank you!';
     } catch (Exception $e) {
-        echo "<script>
-                document.getElementById('form-message-warning').innerHTML = 'Message could not be sent. Mailer Error: {$mail->ErrorInfo}';
-                document.getElementById('form-message-warning').style.display = 'block';
-              </script>";
-    } catch (\Exception $e) {
-        echo "<script>
-                document.getElementById('form-message-warning').innerHTML = 'Something went wrong: {$e->getMessage()}';
-                document.getElementById('form-message-warning').style.display = 'block';
-              </script>";
+        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
     }
+} else {
+    echo 'There was a problem with your submission. Please try again.';
 }
 ?>
