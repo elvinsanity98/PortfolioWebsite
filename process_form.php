@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $mail->Port       = 465;                                    // TCP port to connect to
 
         // Recipients
-        $mail->setFrom('7b656a002@smtp-brevo.com', 'Your Name');
+        $mail->setFrom('kaeltheinvoker121@gmail.com', 'Your Name');
         $mail->addAddress('kaeltheinvoker121@gmail.com', 'Recipient Name'); // Add a recipient
 
         // Content
